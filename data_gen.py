@@ -39,7 +39,7 @@ class ProductGenerator:
                 "producent_szczotek": self.fake.company(),
                 "zasilanie": random.choice(["Akumulator", "Sieciowe", "Atom", "Chomki"]),
                 "certyfikaty": [
-                    {"kod": self.fake.ean8(), "data": self.fake.past_date().isoformat()}
+                    {"kod": self.fake.ean8(), "data": self.fake.date_between(start_date="-30y", end_date="today").isoformat()}
                     for _ in range(random.randint(1, 3))
                 ]
             }

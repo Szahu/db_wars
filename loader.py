@@ -52,7 +52,7 @@ def reset_mongodb():
     except Exception as e:
         print(f"❌ [MG] Błąd MongoDB: {e}")
 
-def load_data(total_records=1000000, batch_size=5000):
+def load_data(total_records=1000000, batch_size=100000):
     gen = ProductGenerator()
     
     # Połączenia
