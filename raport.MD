@@ -7,6 +7,18 @@
 **Kontekst Operacyjny (Setup Środowiska):**
 Na potrzeby audytu zbudowaliśmy potężny generator polimorficznego "gulaszu atrybutów". Wygenerował on okrągły **milion (1 000 000) rekordów**, zanieczyszczając bazę produktami takimi jak używane procesory, "Turbo-Wiertarki Zemsta Sąsiada" czy wegański jarmuż. Zadbano o pełne zróżnicowanie: różne typy danych (float, boolean, zagnieżdżone tablice, obiekty). Bazy otrzymały dokładnie ten sam strumień danych (dzięki stałemu ziarnu losowości `seed=42`), co gwarantuje uczciwość pojedynku.
 
+--
+
+## 🧩 Anatomia "Gulaszu Atrybutów" (Struktura Polimorficzna)
+
+Kluczowym elementem sprawdzającym elastyczność obu baz była losowa, ale w 100% powtarzalna (dzięki `seed=42`) struktura pola `atrybuty`. Zamiast klasycznych, płaskich danych, klasa `ProductGenerator` stworzyła wysoce polimorficzny zbiór, w którym schemat JSON/BSON drastycznie zmieniał się w zależności od przypisanej kategorii:
+
+* **Narzędzia:** Stanowiły główny poligon doświadczalny dla naszych zapytań. Posiadały liczbowe `obroty_max`, flagę logiczną `udar`, zasilanie o fantazyjnych wartościach (np. "Atom", "Chomki") oraz najtrudniejszą do przeszukiwania strukturę – `certyfikaty`. Była to zagnieżdżona, dynamiczna (od 1 do 3 elementów) tablica słowników zawierająca kody EAN8 oraz daty w formacie ISO, wymuszająca na bazach tzw. Deep Nesting Search.
+* **Elektronika:** Charakteryzowała się głębokim zagnieżdżeniem obiektów. Zawierała obiekt `cpu` (z własnym producentem, taktowaniem i flagą `gamingowy`), płaskie parametry liczbowe (`ram_gb`), obiektową `gwarancję` oraz losowej długości tablicę tekstową `porty`.
+* **Nabiał:** Wprowadzał parametry zmiennoprzecinkowe (`tluszcz_procent`), liczby całkowite (`cukier_g`), tablice `bakterie_lct` oraz daty ważności. Prawdziwą "pułapką" w tej kategorii było jednak pole logiczne o celowo zanieczyszczonej składni klucza: `'"wysoko proteinowy"'` (zawierające dodatkowe cudzysłowy), testujące odporność parserów bazodanowych na brudne dane wejściowe.
+
+Taki rozstrzał typów (od list i zagnieżdżonych słowników po inty, floaty i daty ISO) oraz specyficzne anomalie w nazewnictwie kluczy idealnie symulują środowisko, w którym na wejściu API panuje "wolna amerykanka". Wymusiło to na Postgresie nieustanne parsowanie formatu JSONB i demaskowało, jak bazy radzą sobie z tysiącami zapytań o pola, których dana kategoria fizycznie nie posiada (np. brak zasilania w elektronice).
+
 ---
 
 ## 📊 Eksperyment 0: "Puchnięcie Danych" (Storage Efficiency)
